@@ -21,6 +21,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The container and compose file now default to `streamable-http` rather than
   `sse`. The published port stays pinned to the host's loopback interface.
 
+### Changed (cont.)
+- `data/openhr.db` is now committed, pre-seeded with the demo company, so a
+  clone is runnable without a bootstrap step. `.gitattributes` marks `data/*.db`
+  binary so git never attempts a textual merge of a SQLite file. Seeding remains
+  the way to reset it; note that a tracked binary shows as modified after any
+  local run that writes to it.
+
 ### Fixed
 - `run_mcp.py` ignored `MCP_TRANSPORT` and always served stdio, so the
   documented `MCP_TRANSPORT=sse python run_mcp.py` silently did nothing. It now

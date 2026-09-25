@@ -9,13 +9,16 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## 2) Seed the database
+## 2) The database
+
+`data/openhr.db` ships with the repo, already seeded — skip this step unless you
+want to reset it:
 
 ```bash
 python scripts/seed.py
 ```
 
-This creates `data/openhr.db` with the demo company: 9 employees across 5
+It rebuilds `data/openhr.db` with the demo company: 9 employees across 5
 departments, 11 leave requests, 8 assets (7 in someone's hands), 3 requisitions
 with 6 candidates and 7 interview rounds, 15 documents, the 2026 holiday
 calendar and one exit in progress. Re-running it resets the DB.

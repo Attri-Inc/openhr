@@ -1,0 +1,4 @@
+# The seeded demo database ships with the repo. Mark it binary so git never
+# tries to diff or three-way-merge it — a textual merge of a SQLite file
+# produces a corrupt database, not a conflict.
+data/*.db binary

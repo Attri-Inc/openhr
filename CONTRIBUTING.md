@@ -10,8 +10,19 @@ cd open-hr
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
-python scripts/seed.py        # creates ./data/openhr.db with the demo company
 ```
+
+`data/openhr.db` is committed, pre-seeded with the demo company, so there is no
+bootstrap step. Re-seed when you change the schema or want a clean slate:
+
+```bash
+python scripts/seed.py        # deletes and rebuilds ./data/openhr.db
+```
+
+Because the database is a tracked binary, anything that writes to it — the smoke
+test does — leaves your working tree dirty. Re-seed before committing so the
+checked-in file stays the pristine seeded state, or
+`git checkout -- data/openhr.db` to throw the churn away.
 
 Configuration is read from environment variables (see `.env.example` for the
 list, e.g. `OPENHR_DB`). There is no automatic `.env` loading — export the

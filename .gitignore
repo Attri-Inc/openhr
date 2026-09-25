@@ -40,9 +40,21 @@ ENV/
 .env.local
 .env.*.local
 
-# OpenHR data — the people database stays out of version control.
-# Run `python scripts/seed.py` to bootstrap a fresh dev database with sample records.
+# OpenHR data.
+#
+# data/openhr.db IS tracked: it ships the seeded demo company so the repo is
+# runnable the moment it is cloned, without a seed step. It contains only the
+# fictional dataset from scripts/seed.py — never point OPENHR_DB at a tracked
+# file when working with real employee records.
+#
+# Regenerate it with `python scripts/seed.py`. Because it is a tracked binary,
+# any local run that writes to it (the smoke test does) will show up as a
+# modified file; re-seed before committing, or `git checkout -- data/openhr.db`
+# to discard the churn.
 data/*.db
+!data/openhr.db
+
+# SQLite sidecar files are always local — never commit these.
 data/*.db-journal
 data/*.db-wal
 data/*.db-shm

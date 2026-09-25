@@ -29,7 +29,13 @@ repository is the system of record behind it.
 cd open-hr
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python scripts/seed.py            # bootstrap a fresh dev DB with the demo company
+```
+
+`data/openhr.db` ships with the repo, already seeded with the demo company, so
+it runs straight after cloning. To reset it — or after changing the schema:
+
+```bash
+python scripts/seed.py            # deletes and rebuilds data/openhr.db
 ```
 
 ### Connect from Claude Desktop / Code
