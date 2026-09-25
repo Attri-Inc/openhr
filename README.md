@@ -17,6 +17,12 @@ repository is the system of record behind it.
 
 ---
 
+## See it in action
+
+![OpenHR in Claude Cowork](docs/images/cowork-demo.gif)
+
+---
+
 ## Quick Start
 
 ```bash
@@ -57,12 +63,12 @@ See [docs/claude-connector.md](docs/claude-connector.md) for the full setup.
                 └────────────────────┬────────────────────┘
                                      │
                                      ▼
-                           MCP server (stdio / SSE :8792)
-                           31 tools — reads + safe writes
+                     MCP server — 31 tools, reads + safe writes
+                     stdio  ·  streamable-http /mcp :8792  ·  sse
                                      │
                                      ▼
                            Claude Desktop, Claude Code,
-                           agent frameworks
+                           Cowork (remote), agent frameworks
 ```
 
 ### Project structure
@@ -138,9 +144,9 @@ behind the repository protocols, so services never see a query.
 | Env var | Default | Notes |
 |---|---|---|
 | `OPENHR_DB` | `./data/openhr.db` | SQLite path |
-| `MCP_TRANSPORT` | `stdio` (via `run_mcp.py`) | `stdio` or `sse` |
-| `MCP_HOST` | `127.0.0.1` | SSE only — loopback by default, deliberately |
-| `MCP_PORT` | `8792` | SSE only |
+| `MCP_TRANSPORT` | `stdio` (via `run_mcp.py`) | `stdio`, `streamable-http` (served at `/mcp`), or `sse` |
+| `MCP_HOST` | `127.0.0.1` | HTTP transports only — loopback by default, deliberately |
+| `MCP_PORT` | `8792` | HTTP transports only |
 
 ---
 

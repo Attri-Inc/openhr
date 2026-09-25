@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `streamable-http` transport (served at `/mcp`), the transport remote MCP
+  clients expect. Claude Cowork cannot use a local stdio server at all — its
+  custom connectors reach a remote MCP URL over the public internet — so this
+  is what a Cowork connection requires. `docs/claude-connector.md` gains a
+  Cowork section, including why exposing an unauthenticated v0.1 server is
+  demo-data-only.
+- `MCP_HOST` (default `127.0.0.1`) documented alongside the HTTP transports,
+  and an explicit error for an unknown `MCP_TRANSPORT`.
+
+### Changed
+- The container and compose file now default to `streamable-http` rather than
+  `sse`. The published port stays pinned to the host's loopback interface.
+
+### Fixed
+- `run_mcp.py` ignored `MCP_TRANSPORT` and always served stdio, so the
+  documented `MCP_TRANSPORT=sse python run_mcp.py` silently did nothing. It now
+  delegates to `src.mcp_server:main`, keeping stdio as the default.
+
 ## [0.1.0] — 2026-09-25
 
 ### Added

@@ -59,6 +59,75 @@ Then fully quit and reopen Claude Desktop (Cmd+Q, not just close the window).
 > virtualenv. Pointing the config at the system `python3` would fail with
 > `ModuleNotFoundError: mcp`.
 
+## 3c) Connect to Claude Cowork
+
+**Cowork cannot use a local stdio server.** Local MCP servers configured in
+Claude Desktop's `claude_desktop_config.json` are not available in Cowork or on
+claude.ai — Cowork reaches connectors as *remote* MCP servers over the public
+internet, from Anthropic's IP ranges. Steps 3a and 3b do not apply here.
+
+So OpenHR has to be served over HTTP and reachable from outside your machine.
+
+> ### Read this before you expose it
+>
+> OpenHR has **no authentication in v0.1**. Anyone who learns the URL can read
+> every employee's compensation and write to every record. A tunnel URL is
+> effectively public — it is guessable-adjacent, it is not secret, and it is not
+> protected by your Anthropic login.
+>
+> Only ever do this with the **seeded demo company**, never with real employee
+> data, and take the tunnel down when you are finished. See
+> [SECURITY.md](../SECURITY.md).
+
+### 1. Serve it over streamable HTTP
+
+```bash
+MCP_TRANSPORT=streamable-http MCP_PORT=8792 python run_mcp.py
+```
+
+The MCP endpoint is `http://127.0.0.1:8792/mcp`. (`sse` is also supported for
+older clients; `streamable-http` is the current remote transport.)
+
+Confirm it is up before going further:
+
+```bash
+curl -sS http://127.0.0.1:8792/mcp \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"curl","version":"0"}}}'
+```
+
+You should get a `result` naming the `openhr` server.
+
+### 2. Give it a public URL
+
+Any HTTP tunnel works, e.g.:
+
+```bash
+cloudflared tunnel --url http://127.0.0.1:8792
+# or
+ngrok http 8792
+```
+
+Your connector URL is that public origin plus the MCP path:
+`https://<your-tunnel-host>/mcp`.
+
+The alternative, for anything beyond a demo, is to deploy the container
+(`docker compose up`) behind a host you control with a reverse proxy that adds
+authentication.
+
+### 3. Add it as a custom connector
+
+In Claude, open **Settings → Connectors → Add custom connector**, paste the
+`https://<your-tunnel-host>/mcp` URL, and save. OpenHR does not implement OAuth,
+so leave the advanced client ID / secret fields blank.
+
+> On Team and Enterprise plans a custom connector must first be enabled by an
+> Owner or Primary Owner under **Organization settings → Connectors**. If you do
+> not see the option, that is why.
+
+Then enable the OpenHR connector inside your Cowork session.
+
 ## 4) Verify tools
 
 In Claude, you should see 31 tools named `list_employees`, `get_leave_balance`,

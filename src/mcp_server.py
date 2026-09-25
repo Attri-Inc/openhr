@@ -570,14 +570,30 @@ async def run_query(sql: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-def main() -> None:
-    """Console entry point. Honours MCP_TRANSPORT (stdio default, or sse).
+NETWORK_TRANSPORTS: frozenset[str] = frozenset({"sse", "streamable-http"})
+TRANSPORTS: frozenset[str] = NETWORK_TRANSPORTS | {"stdio"}
 
-    SSE binds to loopback by default — employee records do not go on the LAN
-    unless the operator sets MCP_HOST deliberately.
+
+def main() -> None:
+    """Console entry point. Honours MCP_TRANSPORT.
+
+    - `stdio` (default) — Claude Desktop / Claude Code, which spawn the process.
+    - `streamable-http` — served at /mcp. The transport remote MCP clients
+      (including Claude Cowork's custom connectors) expect.
+    - `sse` — the older HTTP transport, kept for existing clients.
+
+    Both network transports bind to loopback by default: employee records do not
+    go on the network unless the operator sets MCP_HOST deliberately. Nothing in
+    this server authenticates its callers — see SECURITY.md before exposing it.
     """
-    transport = os.getenv("MCP_TRANSPORT", "stdio")  # "stdio" or "sse"
-    if transport == "sse":
+    transport = os.getenv("MCP_TRANSPORT", "stdio")
+    if transport not in TRANSPORTS:
+        raise SystemExit(
+            f"Unknown MCP_TRANSPORT '{transport}'. Must be one of: {', '.join(sorted(TRANSPORTS))}"
+        )
+    if transport == "streamable-http":
+        mcp.run(transport="streamable-http", host=MCP_HOST, port=MCP_PORT)
+    elif transport == "sse":
         mcp.run(transport="sse", host=MCP_HOST, port=MCP_PORT)
     else:
         mcp.run()

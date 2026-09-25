@@ -8,7 +8,10 @@ services:
       - openhr-data:/data
     environment:
       - OPENHR_DB=/data/openhr.db
-      - MCP_TRANSPORT=sse
+      - MCP_TRANSPORT=streamable-http
+      # 0.0.0.0 binds inside the container only; the port mapping above still
+      # pins the published port to the host's loopback interface.
+      - MCP_HOST=0.0.0.0
       - MCP_PORT=8792
     healthcheck:
       test: ["CMD", "python", "-c", "import socket; socket.create_connection(('127.0.0.1', 8792), 2)"]

@@ -22,7 +22,8 @@ RUN mkdir -p /data && \
 USER app
 
 ENV OPENHR_DB=/data/openhr.db \
-    MCP_TRANSPORT=sse \
+    MCP_TRANSPORT=streamable-http \
+    MCP_HOST=0.0.0.0 \
     MCP_PORT=8792
 
 EXPOSE 8792
