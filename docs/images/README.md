@@ -3,7 +3,7 @@
 ## `cowork-demo.gif`
 
 The recording embedded at the top of the root [README](../../README.md), under
-**See it in action**. Until it is added, that image renders broken on GitHub.
+**See it in action**.
 
 It is a screen capture of a real Claude Cowork session driving this MCP server —
 not a mock-up. Match the house format set by
