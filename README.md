@@ -153,6 +153,8 @@ behind the repository protocols, so services never see a query.
 | `MCP_TRANSPORT` | `stdio` (via `run_mcp.py`) | `stdio`, `streamable-http` (served at `/mcp`), or `sse` |
 | `MCP_HOST` | `127.0.0.1` | HTTP transports only — loopback by default, deliberately |
 | `MCP_PORT` | `8792` | HTTP transports only |
+| `MCP_ALLOWED_HOSTS` | *(empty)* | Comma-separated public host names accepted behind a tunnel or reverse proxy, e.g. `openhr.example.com`. Loopback is always allowed |
+| `MCP_ALLOWED_ORIGINS` | *(empty)* | Comma-separated allowed `Origin` values. Defaults to `https://<host>` for each allowed host |
 
 ---
 
