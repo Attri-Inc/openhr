@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   demo-data-only.
 - `MCP_HOST` (default `127.0.0.1`) documented alongside the HTTP transports,
   and an explicit error for an unknown `MCP_TRANSPORT`.
+- `MCP_ALLOWED_HOSTS` and `MCP_ALLOWED_ORIGINS` for the HTTP transports. The
+  MCP SDK's DNS-rebinding protection rejects any Host header other than
+  loopback, so a server behind a tunnel or reverse proxy answered remote
+  clients with "Invalid Host header" (HTTP 421). Operators now declare the
+  public name; loopback stays allowed, and leaving both empty keeps the SDK's
+  local-only default.
 
 ### Changed
 - The container and compose file now default to `streamable-http` rather than

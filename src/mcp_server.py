@@ -8,8 +8,9 @@ typed DomainError) to a JSON envelope via the serialization helpers.
 import os
 
 from mcp.server.mcpserver import MCPServer
+from mcp.server.transport_security import TransportSecuritySettings
 
-from src.config import MCP_HOST, MCP_PORT
+from src.config import MCP_ALLOWED_HOSTS, MCP_ALLOWED_ORIGINS, MCP_HOST, MCP_PORT
 from src.container import container
 from src.domain.errors import DomainError
 from src.serialization import error_response, tool_response
@@ -573,6 +574,27 @@ async def run_query(sql: str) -> str:
 NETWORK_TRANSPORTS: frozenset[str] = frozenset({"sse", "streamable-http"})
 TRANSPORTS: frozenset[str] = NETWORK_TRANSPORTS | {"stdio"}
 
+# Always permitted alongside whatever the operator declares, so a local probe
+# keeps working when the server is also reachable through a proxy.
+LOOPBACK_HOSTS: tuple[str, ...] = ("127.0.0.1:*", "localhost:*", "[::1]:*")
+
+
+def transport_security() -> TransportSecuritySettings | None:
+    """Build the Host/Origin allowlist for the HTTP transports.
+
+    Returning None leaves the SDK's own default in place: it enables DNS-rebinding
+    protection for loopback binds and allows only loopback hosts. That is correct
+    for a local server and wrong the moment one sits behind a tunnel or reverse
+    proxy, where the Host header carries the public name — hence MCP_ALLOWED_HOSTS.
+    """
+    if not (MCP_ALLOWED_HOSTS or MCP_ALLOWED_ORIGINS):
+        return None
+    hosts = [*MCP_ALLOWED_HOSTS, *LOOPBACK_HOSTS]
+    origins = MCP_ALLOWED_ORIGINS or [
+        f"https://{host}" for host in MCP_ALLOWED_HOSTS if not host.endswith(":*")
+    ]
+    return TransportSecuritySettings(allowed_hosts=hosts, allowed_origins=origins)
+
 
 def main() -> None:
     """Console entry point. Honours MCP_TRANSPORT.
@@ -591,10 +613,16 @@ def main() -> None:
         raise SystemExit(
             f"Unknown MCP_TRANSPORT '{transport}'. Must be one of: {', '.join(sorted(TRANSPORTS))}"
         )
+    security = transport_security()
     if transport == "streamable-http":
-        mcp.run(transport="streamable-http", host=MCP_HOST, port=MCP_PORT)
+        mcp.run(
+            transport="streamable-http",
+            host=MCP_HOST,
+            port=MCP_PORT,
+            transport_security=security,
+        )
     elif transport == "sse":
-        mcp.run(transport="sse", host=MCP_HOST, port=MCP_PORT)
+        mcp.run(transport="sse", host=MCP_HOST, port=MCP_PORT, transport_security=security)
     else:
         mcp.run()
 
