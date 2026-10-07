@@ -36,8 +36,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Attri-Inc/open-hr"
-Issues = "https://github.com/Attri-Inc/open-hr/issues"
+Homepage = "https://openhr.opentooling.ai"
+Source = "https://github.com/Attri-Inc/openhr"
+Issues = "https://github.com/Attri-Inc/openhr/issues"
 
 [project.scripts]
 openhr = "src.mcp_server:main"
